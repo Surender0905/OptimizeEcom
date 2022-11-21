@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import Input from '../Input';
 
 const Header = () => {
+  const [search, setSearch] = useState('');
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  };
+
   return (
     <header className="text-gray-600 body-font">
       <div className="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
@@ -19,6 +26,15 @@ const Header = () => {
             Cart {0}
           </NavLink>
         </nav>
+        <div className="mx-4">
+          <Input
+            placeholder="search"
+            name="search"
+            value={search}
+            id="search"
+            onChange={handleSearch}
+          />
+        </div>
         <div className=" flex gap-6">
           <Link to={'/login'} className="mr-5 hover:text-blue-500">
             Login
