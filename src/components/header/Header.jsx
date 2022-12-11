@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import Input from '../Input';
+import WithUser from '../HOC/WithUser';
 
-const Header = () => {
-  const [search, setSearch] = useState('');
-
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
+const Header = ({ user, setUser }) => {
+  const handleLogin = () => {
+    localStorage.removeItem('token');
+    setUser(undefined);
   };
-
   return (
     <header className="text-gray-600 body-font">
       <div className="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
@@ -26,26 +24,28 @@ const Header = () => {
             Cart {0}
           </NavLink>
         </nav>
-        <div className="mx-4">
-          <Input
-            placeholder="search"
-            name="search"
-            value={search}
-            id="search"
-            onChange={handleSearch}
-          />
-        </div>
-        <div className=" flex gap-6">
-          <Link to={'/login'} className="mr-5 hover:text-blue-500">
-            Login
-          </Link>
-          <Link to={'/register'} className="mr-5 hover:text-blue-500">
-            Register
-          </Link>
-        </div>
+
+        {!user && (
+          <div className=" flex gap-6">
+            <Link to={'/login'} className="mr-5 hover:text-blue-500">
+              Login
+            </Link>
+            <Link to={'/register'} className="mr-5 hover:text-blue-500">
+              Register
+            </Link>
+          </div>
+        )}
+
+        {user && (
+          <div>
+            <button type="button" onClick={handleLogin}>
+              Logout
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );
 };
 
-export default Header;
+export default WithUser(Header);

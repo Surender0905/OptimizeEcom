@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Filter from '../components/Filter';
+import WithUser from '../components/HOC/WithUser';
 import Loading from '../components/Loading/Loading';
 import ProductLists from '../components/products-list/ProductLists';
 import { getProducts } from '../lib/Product-Data/productData';
-import NotFound from './NotFound';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -72,4 +72,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default WithUser(Products);
