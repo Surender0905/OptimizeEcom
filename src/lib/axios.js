@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'https://dummyjson.com',
+  baseURL: 'https://myeasykart.codeyogi.io',
   headers: {
     'X-Requested-With': 'XMLHttpRequest',
   },

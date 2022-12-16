@@ -13,7 +13,6 @@ const Filter = (props) => {
       <div className="container px-5 py-4 mx-auto flex justify-between items-center">
         <div>
           <input
-            value={props.query}
             placeholder="search"
             name="search"
             className="border p-1 border-cyan-300"

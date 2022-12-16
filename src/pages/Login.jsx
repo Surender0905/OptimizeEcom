@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { withFormik } from 'formik';
 import * as Yup from 'yup';
-import WithUser from '../components/HOC/WithUser';
+
 import Input from '../components/Input';
+import { withAlert, withUser } from '../components/withProvider';
 
 const schema = Yup.object().shape({
   email: Yup.string().email('Invalid email address').required(),
@@ -20,7 +21,11 @@ const callLoginApi = async (values, bag) => {
       localStorage.setItem('token', token);
       bag.props.setUser(user);
     })
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      if (error) {
+        bag.props.setAlert({ type: 'error', message: 'invalid data' });
+      }
+    });
 };
 const initialValue = {
   email: '',
@@ -102,7 +107,7 @@ const Login = ({
                   placeholder="Email"
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  value={values.email}
+                  value={values.email || ''}
                   touched={touched.email}
                   errors={errors.email}
                 />
@@ -115,7 +120,7 @@ const Login = ({
                   placeholder="Password"
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  value={values.password}
+                  value={values.password || ''}
                   touched={touched.password}
                   errors={errors.password}
                 />
@@ -172,4 +177,4 @@ const inhancedForm = withFormik({
   handleSubmit: callLoginApi,
 })(Login);
 
-export default WithUser(inhancedForm);
+export default withAlert(withUser(inhancedForm));

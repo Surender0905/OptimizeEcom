@@ -1,4 +1,7 @@
+import { range } from 'lodash';
 import React, { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+
 import Filter from '../components/Filter';
 import WithUser from '../components/HOC/WithUser';
 import Loading from '../components/Loading/Loading';
@@ -6,56 +9,49 @@ import ProductLists from '../components/products-list/ProductLists';
 import { getProducts } from '../lib/Product-Data/productData';
 
 const Products = () => {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState({});
 
   const [loading, setLoading] = useState(true);
 
-  const [query, setQuery] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [sort, setSort] = useState('default');
+  const params = Object.fromEntries([...searchParams]);
 
-  const allProducts = async () => {
-    const data = await getProducts();
-    setProducts(data);
-    setLoading(false);
-  };
+  let { query, sort, page } = params;
 
-  useEffect(() => {
-    allProducts();
-  }, []);
+  query = query || '';
+  sort = sort || 'default';
+  page = +page || 1;
 
-  let data = products.filter((product) => {
-    let lowerCaseTitle = product.title.toLowerCase();
+  useEffect(
+    function () {
+      let sortBy;
+      let sortType;
 
-    let search = query.trim().toLowerCase();
+      if (sort === 'rating') {
+        sortBy = 'rating';
+      } else if (sort === 'low') {
+        sortBy = 'price';
+      } else if (sort === 'high') {
+        sortBy = 'price';
+        sortType = 'desc';
+      }
 
-    return lowerCaseTitle.indexOf(search) !== -1;
-  });
+      getProducts(sortBy, sortType, query, page).then((response) => {
+        setProducts(response);
+        setLoading(false);
+      });
+    },
+    [sort, query, page]
+  );
 
   const onChnage = (value) => {
-    setQuery(value);
+    setSearchParams({ ...params, query: value, page: 1 }, { replace: false });
   };
 
   const handleSortChange = (value) => {
-    setSort(value);
+    setSearchParams({ ...params, sort: value }, { replace: false });
   };
-
-  if (sort === 'low') {
-    data.sort(function (x, y) {
-      return x.price - y.price;
-    });
-  }
-  if (sort === 'high') {
-    data.sort(function (x, y) {
-      return y.price - x.price;
-    });
-  }
-
-  if (sort === 'rating') {
-    data.sort(function (x, y) {
-      return y.rating - x.rating;
-    });
-  }
 
   if (loading) {
     return <Loading />;
@@ -63,11 +59,23 @@ const Products = () => {
 
   return (
     <>
-      <Filter onChange={onChnage} query={query} sort={handleSortChange} />
+      <Filter onChange={onChnage} sort={handleSortChange} />
 
-      {data.length > 0 && <ProductLists products={data} />}
+      {products?.data?.length > 0 && <ProductLists products={products?.data} />}
 
-      {data.length === 0 && <p>no product found</p>}
+      {products?.data?.length === 0 && <p>no product found</p>}
+
+      {range(1, products?.meta?.last_page + 1).map((item) => (
+        <Link
+          key={item}
+          to={'?' + new URLSearchParams({ ...params, page: item })}
+          className={
+            'p-2 m-1 ' + (item === page ? 'bg-red-500' : 'bg-indigo-700')
+          }
+        >
+          {item}
+        </Link>
+      ))}
     </>
   );
 };
