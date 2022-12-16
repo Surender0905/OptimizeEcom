@@ -19,8 +19,6 @@ export async function getProducts(sortBy, sortType, search, page) {
     params.page = page;
   }
 
-  console.log('params', params);
-
   const data = await instance
     .get('/products', { params })
     .then((res) => res.data);
